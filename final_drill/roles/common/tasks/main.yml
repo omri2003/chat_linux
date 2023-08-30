@@ -1,0 +1,86 @@
+---
+- vars:
+    ansible_user: root
+  block:
+  - name: install packages
+    package:
+      name:
+        - git
+        - docker
+        - bind-utils
+      state: present
+      update_cache: yes
+
+  - name: add a admin user
+    user:
+      name: admin
+      password: "{{ 'admin' | password_hash('sha512', 'mysecretsalt') }}"
+      groups:
+        - wheel
+      state: "present"
+      shell: "/bin/bash"
+      system: false
+      create_home: true
+      home: "/home/admin"
+      comment: "Ansible admin user"
+      generate_ssh_key: true
+
+- vars:
+    ansible_user: admin
+  become: true
+  block:
+  - name: disable root ssh auth
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: ^PermitRootLogin
+      line: PermitRootLogin no
+    notify: Restart sshd
+
+  - name: turn on the firewall
+    firewalld:
+      permanent: true
+      state: enabled
+
+  - name: turn on SELinux
+    selinux:
+      policy: targeted
+      state: permissive
+    notify: reboot
+
+  - name: create a directory for the nfs
+    file:
+      path: /nfs/omriziv
+      state: directory
+      mode: "0755"
+
+  - name: mnounts a nfs to /mnt/nfs-mount
+    mount:
+      src: 192.168.56.64:/var/nfs/general
+      path: /nfs/omriziv
+      state: mounted
+      fstype: nfs
+
+  - name: increasing the open file limit (os-wide)
+    sysctl:
+      name: fs.file-max
+      value: 50000
+      state: present
+
+  - name: increasing the tcp buffer allowed open ports range 1024 to 65000
+    firewalld:
+      port: 1024-65000/tcp
+      permanent: true
+      state: enabled
+      immediate: true
+
+  - name: Set TCP read memory
+    sysctl:
+      name: net.ipv4.tcp_rmem
+      value: 2097152 2097152 2097152
+      state: present
+
+  - name: Set TCP write memory
+    sysctl:
+      name: net.ipv4.tcp_wmem
+      value: 2097152 2097152 2097152
+      state: present

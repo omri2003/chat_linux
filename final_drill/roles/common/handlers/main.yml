@@ -1,0 +1,16 @@
+---
+- vars:
+    ansible_user: admin
+  become: true
+  block:
+  - name: Restart sshd
+    service:
+      name: sshd
+      state: restarted
+
+  - name: restart_sysctl
+    sysctl:
+      reload: true
+
+  - name: reboot
+    reboot: null

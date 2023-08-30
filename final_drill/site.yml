@@ -1,0 +1,6 @@
+---
+  - hosts: computers
+    tasks:
+      - name : apply common role
+        include_role:
+          name: common
