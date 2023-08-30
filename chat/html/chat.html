@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<html>
+  <body>
+    <section>
+      <p>signed in as {{name}}</p>
+      <textarea disabled=true rows="20" cols="50">{{chat_text}}</textarea>
+      <form method="POST" action="/chat">
+        <input id="user_message_draft" placeholder="write your message here" name="user_message_draft"></input>
+        <input type="submit" value="send" />
+      </form>
+      <form method="POST" action="/logout">
+        <input type="submit" value="Logout" />
+      </form>
+    </section>
+  </body>
+</html>

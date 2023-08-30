@@ -1,0 +1,32 @@
+HTTP/1.1 200 OK
+Content-Type: text/html
+
+<html>
+  <head>
+    <style>
+      section {
+        display: inline-block;
+        margin-left: 40%;
+        margin-top: 10%;
+      }
+
+      section p {
+	color: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section>
+      <p>Hello, {{name}}</p>
+
+      <form method="POST" action="/chat">
+	<input type="submit" value="chat" />
+      </form>
+
+      <form method="POST" action="/logout">
+        <input type="submit" value="Logout" />
+      </form>
+    </section>
+ </body>
+</html>
