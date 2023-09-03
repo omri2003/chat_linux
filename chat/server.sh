@@ -8,7 +8,7 @@ mkfifo response
 function handle_GET_home() {
 	if [ -z $COOKIE_NAME ]
 	then
-		handle_GET_login
+		handle_POST_logout
 	else
 		RESPONSE=$(cat html/home.html | \
 		sed "s/{{$COOKIE_NAME}}/$COOKIE_VALUE/")
@@ -17,18 +17,23 @@ function handle_GET_home() {
 
 function handle_GET_login() {
   	RESPONSE=$(cat html/login.html)
+	echo "runme"
 }
 
 function handle_POST_login() {
 	RESPONSE=$(cat http/post-login.http | \
 	sed "s/{{cookie_name}}/$INPUT_NAME/" | \
-	sed "s/{{cookie_value}}/$INPUT_VALUE/")
+	sed "s/{{cookie_value}}/$INPUT_VALUE/" | \
+	sed "s/{{ip}}/$IP/" | \
+	sed "s/{{port}}/$PORT/")
 }
 
 function handle_POST_logout() {
 	RESPONSE=$(cat http/post-logout.http | \
 	sed "s/{{cookie_name}}/$COOKIE_NAME/" | \
-	sed "s/{{cookie_value}}/$COOKIE_VALUE/")
+	sed "s/{{cookie_value}}/$COOKIE_VALUE/" | \
+	sed "s/{{ip}}/$IP/" | \
+	sed "s/{{port}}/$PORT/")
 }
 
 function handle_POST_chat() {
@@ -62,6 +67,10 @@ function handleRequest() {
 		COOKIE_REGEX='Cookie:\s(.*?)\=(.*?).*?'
 		[[ "$trline" =~ $COOKIE_REGEX ]] &&
 	    	read COOKIE_NAME COOKIE_VALUE <<< $(echo $trline | sed -E "s/$COOKIE_REGEX/\1 \2/")
+
+		HOST_REGEX="Host: ([^:]+):([0-9]+)"
+		[[ "$trline" =~ $HOST_REGEX ]] &&
+		read IP PORT <<< $(echo $trline | sed -E "s/$HOST_REGEX/\1 \2/")
 	done
 
 	## Read body
