@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: chatpod
+spec:
+  containers:
+    - name: chat-server
+      image: chat:latest
+      imagePullPolicy: Never
