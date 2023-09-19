@@ -5,7 +5,7 @@ metadata:
 data:
   nginx.conf: |
     upstream backend {
-      server chat-server:3000;
+      server localhost:3000;
     }
     
     server {

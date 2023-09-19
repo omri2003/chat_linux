@@ -4,6 +4,7 @@ kind: Pod
 metadata:
   name: chatpod
 spec:
+  hostNetwork: true
   containers:
     - name: chat-server
       image: chat:latest
